@@ -4,5 +4,8 @@ namespace carlescliment\StateMachine\Model;
 
 interface TransitionInterface
 {
-    public function transit(Statable $statable);
+    public function getName();
+    public function execute(Statable $statable);
+    public function getPreviousState();
+    public function getNextState();
 }

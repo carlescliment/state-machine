@@ -10,14 +10,32 @@ class Transition implements TransitionInterface
     private $previous;
     private $next;
 
-    public function __construct($previous, $next)
+    public function __construct($name, $previous, $next)
     {
+        $this->name = $name;
         $this->previous = $previous;
         $this->next = $next;
     }
 
+    public function getName()
+    {
+        return $this->name;
+    }
 
-    public function transit(Statable $statable)
+
+    public function getPreviousState()
+    {
+        return $this->previous;
+    }
+
+
+    public function getNextState()
+    {
+        return $this->previous;
+    }
+
+
+    public function execute(Statable $statable)
     {
         if ($statable->getState() !== $this->previous) {
             $message = sprintf('Unable to transite from %s to %s. Expected state %s',

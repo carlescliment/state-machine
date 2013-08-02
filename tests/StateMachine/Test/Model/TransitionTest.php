@@ -9,12 +9,27 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
 
     const PREVIOUS_STATE = 'PREVIOUS_STATE';
     const NEXT_STATE = 'NEXT_STATE';
+    const NAME = 'TRANSITION_NAME';
 
     private $transition;
 
     public function setUp()
     {
-        $this->transition = new Transition(self::PREVIOUS_STATE, self::NEXT_STATE);
+        $this->transition = new Transition(self::NAME, self::PREVIOUS_STATE, self::NEXT_STATE);
+    }
+
+
+    /**
+     * @test
+     */
+    public function itHasAName()
+    {
+        // Arrange
+        // Act
+        $name = $this->transition->getName();
+
+        // Expect
+        $this->assertEquals(self::NAME, $name);
     }
 
 
@@ -35,7 +50,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->with(self::NEXT_STATE);
 
         // Act
-        $this->transition->transit($transitable);
+        $this->transition->execute($transitable);
     }
 
 
@@ -52,6 +67,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue('INVALID_STATE'));
 
         // Act
-        $this->transition->transit($transitable); 
+        $this->transition->execute($transitable); 
     }
 }
