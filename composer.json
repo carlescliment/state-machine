@@ -1,5 +1,5 @@
 {
-    "name": "carlescliment/StateMachine",
+    "name": "carlescliment/state-machine",
     "description": "A simple finite state machine with minimal dependencies",
     "version": "0.0.1-dev",
     "type": "project",
