@@ -1,0 +1,23 @@
+{
+    "name": "carlescliment/StateMachine",
+    "description": "A simple finite state machine with minimal dependencies",
+    "version": "0.0.1-dev",
+    "type": "project",
+    "keywords": ["state", "machine", "state machine"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Carles Climent Granell",
+            "email": "carlescliment@gmail.com",
+            "homepage": "http://www.carlescliment.com",
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+    },
+    "autoload": {
+        "psr-0": { "carlescliment\\StateMachine": "src/" }
+    }
+}
+
+
