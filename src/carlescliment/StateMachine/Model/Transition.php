@@ -7,6 +7,7 @@ use carlescliment\StateMachine\Exception\InvalidTransitionException;
 class Transition implements TransitionInterface
 {
 
+    private $name;
     private $previous;
     private $next;
 
