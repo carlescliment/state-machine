@@ -1,7 +1,7 @@
 {
     "name": "carlescliment/state-machine",
     "description": "A simple finite state machine with minimal dependencies",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "type": "project",
     "keywords": ["state", "machine", "state machine"],
     "license": "MIT",
