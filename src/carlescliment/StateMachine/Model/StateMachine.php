@@ -4,7 +4,7 @@ namespace carlescliment\StateMachine\Model;
 
 use carlescliment\StateMachine\Exception\InvalidTransitionException;
 
-class StateMachine
+class StateMachine implements StateMachineInterface
 {
 
     private $states;
