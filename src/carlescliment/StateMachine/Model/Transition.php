@@ -36,9 +36,15 @@ class Transition implements TransitionInterface
     }
 
 
+    public function isAppliableOn(Statable $statable)
+    {
+        return $statable->getState() == $this->previous;
+    }
+
+
     public function execute(Statable $statable)
     {
-        if ($statable->getState() !== $this->previous) {
+        if (!$this->isAppliableOn($statable)) {
             $message = sprintf('Unable to transite from %s to %s. Expected state %s',
                 $statable->getState(), $this->next, $this->previous);
             throw new InvalidTransitionException($message);

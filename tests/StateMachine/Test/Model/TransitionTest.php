@@ -39,18 +39,34 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
     public function itTransitesEntitiesFromPreviousToNext()
     {
         // Arrange
-        $transitable = $this->getMock('carlescliment\StateMachine\Model\Statable');
-        $transitable->expects($this->any())
-            ->method('getState')
-            ->will($this->returnValue(self::PREVIOUS_STATE));
+        $statable = $this->getStatableMock(self::PREVIOUS_STATE);
 
         // Assert
-        $transitable->expects($this->once())
+        $statable->expects($this->once())
             ->method('setState')
             ->with(self::NEXT_STATE);
 
         // Act
-        $this->transition->execute($transitable);
+        $this->transition->execute($statable);
+    }
+
+
+    /**
+     * @test
+     */
+    public function itChecksIfItIsAppliableOnAnEntity()
+    {
+        // Arrange
+        $appliable_statable = $this->getStatableMock(self::PREVIOUS_STATE);
+        $unappliable_statable = $this->getStatableMock('INVALID_STATE');
+
+        // Assert
+        $expected_appliable = $this->transition->isAppliableOn($appliable_statable);
+        $expected_unappliable = $this->transition->isAppliableOn($unappliable_statable);
+
+        // Act
+        $this->assertTrue($expected_appliable);
+        $this->assertFalse($expected_unappliable);
     }
 
 
@@ -61,12 +77,19 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
     public function itRaisesAnErrorWhenTransitingFromInvalidStates()
     {
         // Arrange
-        $transitable = $this->getMock('carlescliment\StateMachine\Model\Statable');
-        $transitable->expects($this->any())
-            ->method('getState')
-            ->will($this->returnValue('INVALID_STATE'));
+        $statable = $this->getStatableMock('INVALID_STATE');
 
         // Act
-        $this->transition->execute($transitable); 
+        $this->transition->execute($statable);
+    }
+
+
+    private function getStatableMock($previous_state)
+    {
+        $statable = $this->getMock('carlescliment\StateMachine\Model\Statable');
+        $statable->expects($this->any())
+            ->method('getState')
+            ->will($this->returnValue($previous_state));
+        return $statable;
     }
 }

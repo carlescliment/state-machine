@@ -12,19 +12,21 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->machine = new StateMachine;
+        $this->machine->addState('STATE_ONE');
+        $this->machine->addState('STATE_TWO');
     }
 
     /**
      * @test
      */
-    public function itDefinesStates()
+    public function itBringsIfHasAParticularState()
     {
         // Arrange
         // Act
-        $this->machine->addState('STATE_ONE');
+        $has_state = $this->machine->hasState('STATE_ONE');
 
         // Assert
-        $this->assertTrue($this->machine->hasState('STATE_ONE'));
+        $this->assertTrue($has_state);
     }
 
 
@@ -34,8 +36,6 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
     public function itDefinesTransitions()
     {
         // Arrange
-        $this->machine->addState('STATE_ONE');
-        $this->machine->addState('STATE_TWO');
         $transition = $this->getTransitionStub('TRANSITION_NAME', 'STATE_ONE', 'STATE_TWO');
 
         // Act
@@ -53,8 +53,6 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
     public function itRaisesAnErrorWhenAddingATransitionWithInvalidPreviousState()
     {
         // Arrange
-        $this->machine->addState('STATE_ONE');
-        $this->machine->addState('STATE_TWO');
         $transition = $this->getTransitionStub('TRANSITION_NAME', 'UNEXISTING', 'STATE_TWO');
 
         // Act
@@ -70,8 +68,6 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
     public function itRaisesAnErrorWhenAddingATransitionWithInvalidNextState()
     {
         // Arrange
-        $this->machine->addState('STATE_ONE');
-        $this->machine->addState('STATE_TWO');
         $transition = $this->getTransitionStub('TRANSITION_NAME', 'STATE_ONE', 'UNEXISTING');
 
         // Act
@@ -85,11 +81,8 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
     public function itExecutesTransitionsInStatableObjects()
     {
         // Arrange
-        $this->machine->addState('STATE_ONE');
-        $this->machine->addState('STATE_TWO');
-        $transition = $this->getTransitionStub('TRANSITION_NAME', 'STATE_ONE', 'STATE_TWO');
-        $this->machine->addTransition($transition);
-        $statable = $this->getMock('carlescliment\StateMachine\Model\Statable');
+        $transition = $this->addTransitionToMachine('TRANSITION_NAME', 'STATE_ONE', 'STATE_TWO');
+        $statable = $this->getAppliableEntityOn($transition);
 
         // Expect
         $transition->expects($this->once())
@@ -114,6 +107,29 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * @test
+     */
+    public function itAllowsTheSameTransitionInTwoStartingStates()
+    {
+        // Arrange
+        $this->machine->addState('STATE_THREE');
+        $transition1 = $this->addTransitionToMachine('TRANSITION_NAME', 'STATE_ONE', 'STATE_THREE');
+        $transition2 = $this->addTransitionToMachine('TRANSITION_NAME', 'STATE_TWO', 'STATE_THREE');
+        $statable1 = $this->getAppliableEntityOn($transition1);
+        $statable2 = $this->getMock('carlescliment\StateMachine\Model\Statable');
+
+
+        // Expect
+        $transition1->expects($this->at(1))
+            ->method('execute')
+            ->with($statable1);
+
+        // Act
+        $this->machine->execute('TRANSITION_NAME', $statable1);
+        $this->machine->execute('TRANSITION_NAME', $statable2);
+    }
+
 
     private function getTransitionStub($transition_name, $previous_state, $next_state)
     {
@@ -128,5 +144,23 @@ class StateMachineTest extends \PHPUnit_Framework_TestCase
             ->method('getNextState')
             ->will($this->returnValue($next_state));
         return $transition;
-    }        
+    }
+
+
+    private function getAppliableEntityOn($transition)
+    {
+        $statable = $this->getMock('carlescliment\StateMachine\Model\Statable');
+        $transition->expects($this->any())
+            ->method('isAppliableOn')
+            ->will($this->returnValue(true));
+        return $statable;
+    }
+
+
+    private function addTransitionToMachine($transition_name, $start_state, $end_state)
+    {
+        $transition = $this->getTransitionStub($transition_name, $start_state, $end_state);
+        $this->machine->addTransition($transition);
+        return $transition;
+    }
 }

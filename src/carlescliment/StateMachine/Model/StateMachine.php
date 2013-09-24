@@ -17,6 +17,16 @@ class StateMachine implements StateMachineInterface
     }
 
 
+    public function hasState($state) {
+        return isset($this->states[$state]);
+    }
+
+
+    public function hasTransition($transition_name) {
+        return isset($this->transitions[$transition_name]);
+    }
+
+
     public function addState($state) {
         $this->states[$state] = true;
     }
@@ -24,17 +34,7 @@ class StateMachine implements StateMachineInterface
 
     public function addTransition(TransitionInterface $transition) {
         $this->assertTransitionStatesAreValid($transition);
-        $this->transitions[$transition->getName()] = $transition;
-    }
-
-    public function execute($transition_name, Statable $statable)
-    {
-        if (!$this->hasTransition($transition_name)) {
-            $message = sprintf('The transition %s has not been added to the state machine.',
-                $transition_name);
-            throw new InvalidTransitionException($message);
-        }
-        $this->transitions[$transition_name]->execute($statable);
+        $this->transitions[$transition->getName()][] = $transition;
     }
 
 
@@ -45,7 +45,6 @@ class StateMachine implements StateMachineInterface
                 $transition->getPreviousState(), $transition->getName());
             throw new InvalidTransitionException($message);
         }
-        
         if (!$this->hasState($transition->getNextState())) {
             $message = sprintf('The next state %s in the transition %s has not been added to the state machine.',
                 $transition->getNextState(), $transition->getName());
@@ -54,11 +53,31 @@ class StateMachine implements StateMachineInterface
     }
 
 
-    public function hasState($state) {
-        return isset($this->states[$state]);
+    public function execute($transition_name, Statable $statable)
+    {
+        $this->assertTransitionExists($transition_name);
+        $transitions = $this->transitions[$transition_name];
+        $this->executeAppliableTransitionsOnStatable($transitions, $statable);
     }
 
-    public function hasTransition($transition_name) {
-        return isset($this->transitions[$transition_name]);
-    }    
+
+    private function assertTransitionExists($transition_name)
+    {
+        if (!$this->hasTransition($transition_name)) {
+            $message = sprintf('The transition %s has not been added to the state machine.',
+                $transition_name);
+            throw new InvalidTransitionException($message);
+        }
+    }
+
+
+    private function executeAppliableTransitionsOnStatable(array $transitions, Statable $statable)
+    {
+        foreach ($transitions as $transition) {
+            if ($transition->isAppliableOn($statable)) {
+                $transition->execute($statable);
+                return;
+            }
+        }
+    }
 }
