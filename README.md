@@ -59,11 +59,12 @@ Implementing a state machine is straight-forward. You need four components; an s
     }
 
 
-    class SemaphoreStateMachine
+    class SemaphoreStateMachine extends StateMachine
     {
         public function __construct()
         {
             parent::construct();
+
             foreach (SemaphoreStates::all() as $state) {
                 $this->addState($state);
             }
