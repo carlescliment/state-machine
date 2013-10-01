@@ -11,7 +11,7 @@ Update your `composer.json` file adding the following dependency and run `php co
 
 ## Usage
 
-Implementing a state machine is straight-forward. You need four components; an statable object, states, transitions and the state machine.
+Implementing a state machine is straight-forward. You need four components; a statable object, states, transitions and the state machine.
 
 
     <?php
